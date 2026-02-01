@@ -1,0 +1,22 @@
+name: Build mine keymap
+
+on:
+  push:
+    paths:
+      - 'qmk_firmware/keyboards/keyball/keyball61/keymaps/mine/**'
+      - 'qmk_firmware/keyboards/keyball/lib/**'
+      - 'qmk_firmware/keyboards/keyball/drivers/**'
+      - 'qmk_firmware/keyboards/keyball/keyball61/*.c'
+      - 'qmk_firmware/keyboards/keyball/keyball61/*.h'
+      - 'qmk_firmware/keyboards/keyball/keyball61/*.mk'
+      - '.github/workflows/build-mine.yml'
+
+jobs:
+
+  build:
+
+    uses: ./.github/workflows/build-firmware.yml
+    with:
+      qmk_version: '0.22.14'
+      keyboard:    keyball61
+      keymap:      mine

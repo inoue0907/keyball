@@ -1,7 +1,7 @@
 # Keyball61 rules.mk
 
 POINTING_DEVICE_ENABLE = yes
-COMBO_ENABLE = yes
+COMBO_ENABLE = no
 MOUSEKEY_ENABLE = yes
 OLED_ENABLE = yes
 

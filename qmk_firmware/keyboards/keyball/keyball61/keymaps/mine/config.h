@@ -16,9 +16,6 @@
 // Keyballのデフォルト設定で調整可能
 // CPI_I100/CPI_D100 キーで実行時に変更できます
 
-// --- Combo settings ---
-#define COMBO_COUNT 7
-#define COMBO_TERM  50             // コンボ入力の許容時間 (ms)
 
 // --- Vial support (Vialを使う場合はコメントを外す) ---
 // #define VIAL_KEYBOARD_UID {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}

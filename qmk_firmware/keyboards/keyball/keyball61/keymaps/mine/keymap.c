@@ -22,61 +22,7 @@ enum layers {
 enum custom_keycodes {
     SEND_TIMES = QK_USER,  // Alt+0215 (× multiplication sign)
     OPEN_NOTEPAD,          // Win+R → notepad → Enter
-    CMB_TOGGLE,            // Combo: toggle O24/QWERTY
 };
-
-// --- Combos ---
-// NOTE: Key positions are for LAYOUT_right_ball (Keyball61)
-// Row 0: pos  0- 5 (left),  6-11 (right)
-// Row 1: pos 12-17 (left), 18-23 (right)
-// Row 2: pos 24-29 (left), 30-35 (right)
-// Row 3: pos 36-42 (left), 43-49 (right)
-// Row 4: pos 50-55 (left), 56-60 (right)
-//
-// 実際のキーボードに合わせてポジションを調整してください
-
-const uint16_t PROGMEM combo_esc[]       = {KC_Q, KC_L, COMBO_END};          // Q+L → ESC
-const uint16_t PROGMEM combo_tab[]       = {KC_E, KC_I, COMBO_END};          // E+I → TAB
-const uint16_t PROGMEM combo_tab2[]      = {KC_N, KC_S, COMBO_END};          // N+S → TAB
-const uint16_t PROGMEM combo_stab[]      = {KC_T, KC_N, COMBO_END};          // T+N → Shift+TAB
-const uint16_t PROGMEM combo_toggle[]    = {KC_Y, KC_P, COMBO_END};          // Y+P → Toggle O24/QWERTY
-const uint16_t PROGMEM combo_altf4[]     = {KC_COMM, KC_LALT, COMBO_END};    // ,+ALT → Alt+F4
-const uint16_t PROGMEM combo_ctrlshift[] = {KC_LCTL, LSFT_T(KC_Z), COMBO_END}; // Ctrl+Z(key) → Ctrl+Shift
-
-enum combo_names {
-    CMB_ESC,
-    CMB_TAB,
-    CMB_TAB2,
-    CMB_STAB,
-    CMB_TOGGLE_LAYOUT,
-    CMB_ALTF4,
-    CMB_CTRLSHIFT,
-    COMBO_LENGTH
-};
-uint16_t COMBO_LEN = COMBO_LENGTH;
-
-combo_t key_combos[] = {
-    [CMB_ESC]            = COMBO(combo_esc, KC_ESC),
-    [CMB_TAB]            = COMBO(combo_tab, KC_TAB),
-    [CMB_TAB2]           = COMBO(combo_tab2, KC_TAB),
-    [CMB_STAB]           = COMBO(combo_stab, S(KC_TAB)),
-    [CMB_TOGGLE_LAYOUT]  = COMBO_ACTION(combo_toggle),
-    [CMB_ALTF4]          = COMBO(combo_altf4, A(KC_F4)),
-    [CMB_CTRLSHIFT]      = COMBO(combo_ctrlshift, S(KC_RCTL)),
-};
-
-void process_combo_event(uint16_t combo_index, bool pressed) {
-    if (!pressed) return;
-    switch (combo_index) {
-        case CMB_TOGGLE_LAYOUT:
-            if (layer_state_is(_O24) || default_layer_state == (1UL << _O24)) {
-                default_layer_set(1UL << _QWERTY);
-            } else {
-                default_layer_set(1UL << _O24);
-            }
-            break;
-    }
-}
 
 // --- Keymap ---
 // Keyball61 LAYOUT_right_ball:
