@@ -644,7 +644,8 @@ void keyboard_post_init_kb(void) {
         keyball_set_cpi(c.cpi);
         keyball_set_scroll_div(c.sdiv);
 #ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
-        set_auto_mouse_enable(c.amle);
+        // default to enabled when EEPROM has not been explicitly saved
+        set_auto_mouse_enable(c.raw == 0 ? true : c.amle);
         keyball_set_auto_mouse_timeout(c.amlto == 0 ? AUTO_MOUSE_TIME : (c.amlto + 1) * AML_TIMEOUT_QU);
 #endif
 #if KEYBALL_SCROLLSNAP_ENABLE == 2
