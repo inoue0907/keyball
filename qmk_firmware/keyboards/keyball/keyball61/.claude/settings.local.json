@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Read(//c/Users/kirim/Documents/keyball/qmk_firmware/**)"
+    ]
+  }
+}

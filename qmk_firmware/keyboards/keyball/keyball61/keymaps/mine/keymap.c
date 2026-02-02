@@ -46,9 +46,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // Row 2 - moNa2 Row 1
         KC_E,          KC_I,    KC_A,    KC_O,    KC_MINS, XXXXXXX,                      KC_BSPC, KC_K,         KC_T,    KC_N,    KC_S,         LT(_NUM,KC_H),
         // Row 3 - moNa2 Row 2
-        LSFT_T(KC_Z),  KC_X,   KC_C,    KC_V,    KC_SCLN, LT(_ADJUST,KC_QUOT), XXXXXXX, JP_UNDS, KC_G,         KC_D,    KC_M,    KC_J,         LT(_SCROLL,KC_B), KC_SLSH,
+        LSFT_T(KC_Z),  KC_X,    KC_C,    KC_V,    KC_SCLN, LT(_ADJUST,KC_QUOT), XXXXXXX, JP_UNDS, KC_G,         KC_D,    KC_M,    KC_J,         LT(_SCROLL,KC_B), KC_SLSH,
         // Row 4 - Thumb cluster (moNa2 Row 3)
-        XXXXXXX, XXXXXXX, KC_LCTL, KC_LGUI, KC_LALT, LT(_SYM,KC_LNG2),                 LT(_NUM,KC_SPC), LT(_NAV,KC_LNG1), LSFT_T(KC_TAB), LT(_NUM,KC_ENT), XXXXXXX
+        XXXXXXX,       XXXXXXX, KC_LCTL, KC_LGUI, KC_LALT, LT(_SYM,KC_LNG2),             LT(_NUM,KC_SPC), LT(_NAV,KC_LNG1), LSFT_T(KC_TAB), LT(_NUM,KC_ENT), XXXXXXX
     ),
 
     // =============================================
@@ -58,8 +58,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_ESC,        KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                         KC_6,    KC_7,         KC_8,    KC_9,    KC_0,         KC_BSPC,
         KC_TAB,        KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,         LT(_SCROLL,KC_I), KC_O, KC_P,  JP_CIRC,
         KC_A,          KC_S,    KC_D,    KC_F,    KC_G,    XXXXXXX,                      KC_BSPC, KC_H,         KC_J,    KC_K,    KC_L,         LT(_NUM,KC_SCLN),
-        LSFT_T(KC_Z),  KC_X,   KC_C,    KC_V,    KC_B,    LT(_ADJUST,KC_MINS), XXXXXXX, JP_UNDS, KC_N,         KC_M,    KC_COMM, KC_DOT,       LT(_SCROLL,KC_QUOT), KC_SLSH,
-        XXXXXXX, XXXXXXX, KC_LCTL, KC_LGUI, KC_LALT, LT(_SYM,KC_LNG2),                 LT(_NUM,KC_SPC), LT(_NAV,KC_LNG1), LSFT_T(KC_TAB), LT(_NUM,KC_ENT), XXXXXXX
+        LSFT_T(KC_Z),  KC_X,    KC_C,    KC_V,    KC_B,    LT(_ADJUST,KC_MINS), XXXXXXX, JP_UNDS, KC_N,         KC_M,    KC_COMM, KC_DOT,       LT(_SCROLL,KC_QUOT), KC_SLSH,
+        XXXXXXX,       XXXXXXX, KC_LCTL, KC_LGUI, KC_LALT, LT(_SYM,KC_LNG2),             LT(_NUM,KC_SPC), LT(_NAV,KC_LNG1), LSFT_T(KC_TAB), LT(_NUM,KC_ENT), XXXXXXX
     ),
 
     // =============================================
@@ -78,9 +78,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // =============================================
     [_SYM] = LAYOUT_right_ball(
         _______, _______, _______, _______, _______, _______,                            _______, _______, _______, _______, _______, _______,
-        _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                             JP_HASH, JP_EXLM, JP_DQUO, JP_LPRN, JP_RPRN, _______,
-        KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,                           JP_CIRC, JP_AMPR, JP_QUES, JP_QUOT, JP_LCBR, JP_RCBR,
-        KC_F11,  KC_F12,  KC_F13,  KC_F14,  KC_F15,  _______, _______,                  JP_DLR,  JP_PERC, JP_BSLS, JP_GRV,  JP_LBRC, JP_RBRC, _______,
+        _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                              JP_HASH, JP_EXLM, JP_DQUO, JP_LPRN, JP_RPRN, _______,
+        KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,                            JP_CIRC, JP_AMPR, JP_QUES, JP_QUOT, JP_LCBR, JP_RCBR,
+        KC_F11,  KC_F12,  KC_F13,  KC_F14,  KC_F15,  _______, _______,                   JP_DLR,  JP_PERC, JP_BSLS, JP_GRV,  JP_LBRC, JP_RBRC, _______,
         _______, _______, _______, _______, _______, _______,                            JP_TILD, JP_AT,   _______, _______, JP_PIPE
     ),
 
@@ -89,9 +89,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // =============================================
     [_NAV] = LAYOUT_right_ball(
         _______, _______, _______, _______, _______, _______,                            _______, _______,      _______,      _______,       _______, _______,
-        _______, KC_PSCR, G(KC_7), G(KC_8), G(KC_9), A(KC_F4),                          KC_HOME, C(KC_LEFT),   C(KC_RGHT),   KC_END,        _______, _______,
-        OPEN_NOTEPAD, G(KC_4), G(KC_5), G(KC_6), _______, _______,                      _______, KC_LEFT,      KC_DOWN,      KC_UP,         KC_RGHT, _______,
-        _______, G(KC_1), G(KC_2), G(KC_3), _______, G(KC_L), _______,                  _______, S(KC_LEFT),   S(KC_DOWN),   S(KC_UP),      S(KC_RGHT), _______, _______,
+        _______, KC_PSCR, G(KC_7), G(KC_8), G(KC_9), A(KC_F4),                           KC_HOME, C(KC_LEFT),   C(KC_RGHT),   KC_END,        _______, _______,
+        OPEN_NOTEPAD, G(KC_4), G(KC_5), G(KC_6), _______, _______,                       _______, KC_LEFT,      KC_DOWN,      KC_UP,         KC_RGHT, _______,
+        _______, G(KC_1), G(KC_2), G(KC_3), _______, G(KC_L), _______,                   _______, S(KC_LEFT),   S(KC_DOWN),   S(KC_UP),      S(KC_RGHT), _______, _______,
         _______, _______, _______, _______, _______, _______,                            _______, _______,      _______,      KC_LGUI, _______
     ),
 
@@ -100,10 +100,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // =============================================
     [_ADJUST] = LAYOUT_right_ball(
         _______, _______, _______, _______, _______, _______,                            _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______,                            CPI_I100,CPI_I1K, SCRL_DVI,_______, _______, _______,
-        _______, _______, _______, _______, _______, _______,                            CPI_D100,CPI_D1K, SCRL_DVD,_______, _______, _______,
-        _______, _______, _______, _______, _______, _______, _______,                   QK_BOOT, SCRL_TO, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, _______, _______,                            _______, _______, _______, _______, _______
+        _______, _______, _______, _______, _______, _______,                            CPI_I100,CPI_I1K, SCRL_DVI,AML_I50, _______, _______,
+        _______, _______, _______, _______, _______, _______,                            CPI_D100,CPI_D1K, SCRL_DVD,AML_D50, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______,                   QK_BOOT, SCRL_TO, AML_TO,  _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______,                            _______, _______, KBC_SAVE,_______, _______
     ),
 
     // =============================================
