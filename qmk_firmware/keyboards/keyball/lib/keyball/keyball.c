@@ -297,7 +297,12 @@ static uint16_t movement_size_of(report_mouse_t *rep) {
 // override qmk function:
 //  https://github.com/qmk/qmk_firmware/blob/0.22.14/quantum/pointing_device/pointing_device_auto_mouse.c#L208-L221
 // activate auto mouse layer when mouse movement exceeds the threshold.
+// suppress activation while scroll mode is active.
 bool auto_mouse_activation(report_mouse_t mouse_report) {
+    if (keyball.scroll_mode) {
+        keyball.total_mouse_movement = 0;
+        return false;
+    }
     keyball.total_mouse_movement += movement_size_of(&mouse_report);
     if (AML_ACTIVATE_THRESHOLD < keyball.total_mouse_movement) {
         keyball.total_mouse_movement = 0;

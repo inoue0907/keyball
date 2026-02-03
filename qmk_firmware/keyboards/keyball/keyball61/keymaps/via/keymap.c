@@ -67,15 +67,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // clang-format on
 
 layer_state_t layer_state_set_user(layer_state_t state) {
+    // Auto enable scroll mode when layer 3 is active
+    keyball_set_scroll_mode(layer_state_cmp(state, 3));
 #ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
-    // Deactivate AML when layer 3 (scroll) is active so scroll takes priority
-    if (layer_state_cmp(state, 3)) {
-        state &= ~((layer_state_t)1 << AUTO_MOUSE_DEFAULT_LAYER);
-        layer_off(AUTO_MOUSE_DEFAULT_LAYER);
-    }
     keyball_handle_auto_mouse_layer_change(state);
 #endif
-    // Auto enable scroll mode when the highest layer is 3
-    keyball_set_scroll_mode(get_highest_layer(state) == 3);
     return state;
 }
