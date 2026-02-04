@@ -201,6 +201,10 @@ static void adjust_mouse_speed(keyball_motion_t *m) {
 }
 
 __attribute__((weak)) void keyball_on_apply_motion_to_mouse_move(keyball_motion_t *m, report_mouse_t *r, bool is_left) {
+#ifdef POINTING_DEVICE_AUTO_MOUSE_ENABLE
+    // accumulate raw movement before speed adjustment for AML activation
+    keyball.total_mouse_movement += abs(m->x) + abs(m->y);
+#endif
     adjust_mouse_speed(m);
 #if KEYBALL_MODEL == 61 || KEYBALL_MODEL == 39 || KEYBALL_MODEL == 147 || KEYBALL_MODEL == 44
     r->x = clip2int8(m->y);
@@ -316,10 +320,6 @@ static uint16_t get_auto_mouse_keep_time(void) {
 #endif
 }
 
-static uint16_t movement_size_of(report_mouse_t *rep) {
-    return abs(rep->x) + abs(rep->y);
-}
-
 // override qmk function:
 //  https://github.com/qmk/qmk_firmware/blob/0.22.14/quantum/pointing_device/pointing_device_auto_mouse.c#L208-L221
 // activate auto mouse layer when mouse movement exceeds the threshold.
@@ -329,7 +329,8 @@ bool auto_mouse_activation(report_mouse_t mouse_report) {
         keyball.total_mouse_movement = 0;
         return false;
     }
-    keyball.total_mouse_movement += movement_size_of(&mouse_report);
+    // total_mouse_movement is accumulated from raw sensor data
+    // in keyball_on_apply_motion_to_mouse_move (before speed adjustment)
     if (AML_ACTIVATE_THRESHOLD < keyball.total_mouse_movement) {
         keyball.total_mouse_movement = 0;
         if (get_auto_mouse_timeout() != get_auto_mouse_keep_time()) {
