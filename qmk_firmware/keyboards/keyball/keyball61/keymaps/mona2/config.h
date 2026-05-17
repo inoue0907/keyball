@@ -22,8 +22,6 @@
 
 // Match mona2's &mt tapping-term-ms = 150
 #define TAPPING_TERM 150
-// Match mona2's &lt quick-tap-ms = 300
-#define QUICK_TAP_TERM 300
 // Match mona2's "balanced" flavor
 #define PERMISSIVE_HOLD
 
