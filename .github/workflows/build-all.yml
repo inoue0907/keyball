@@ -30,7 +30,7 @@ jobs:
     strategy:
       matrix:
         keyboard: [ keyball61 ]
-        keymap: [ via ]
+        keymap: [ via, mona2 ]
 
     uses: ./.github/workflows/build-firmware.yml
     with:
