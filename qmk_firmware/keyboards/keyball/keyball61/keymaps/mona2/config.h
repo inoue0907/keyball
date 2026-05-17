@@ -30,7 +30,9 @@
 #define AUTO_MOUSE_DEFAULT_LAYER 5
 
 // VIA: must match keymapLayerCount in mona2_via.json
-#define DYNAMIC_KEYMAP_LAYER_COUNT 8
+// ATmega32U4 EEPROM (1KB): OLED_ENABLE increases EECONFIG_SIZE, so max 4 layers
+// (4*10*8*2=640 bytes + overhead). Layers 4-7 remain in flash and work normally.
+#define DYNAMIC_KEYMAP_LAYER_COUNT 4
 
 // Combos: ESC (pos39+38) and TAB (pos11+12) from mona2
 #define COMBO_COUNT 2

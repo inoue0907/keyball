@@ -4,7 +4,7 @@
   "productId": "0x0100",
   "matrix": { "rows": 10, "cols": 8 },
   "lighting": "qmk_rgblight",
-  "keymapLayerCount": 8,
+  "keymapLayerCount": 4,
   "layouts" : {
     "labels": [
       [ "Ball availability", "None", "Right", "Left", "Dual" ]
