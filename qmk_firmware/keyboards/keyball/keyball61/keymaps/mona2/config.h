@@ -33,6 +33,10 @@
 // ATmega32U4 EEPROM (1KB): OLED_ENABLE increases EECONFIG_SIZE, so max 4 layers
 // (4*10*8*2=640 bytes + overhead). Layers 4-7 remain in flash and work normally.
 #define DYNAMIC_KEYMAP_LAYER_COUNT 4
+// Allow 8 keymap layers total while VIA only manages layers 0-3 in EEPROM.
+// Without this, VIA sets MAX_LAYER=DYNAMIC_KEYMAP_LAYER_COUNT=4 and the
+// keymap_introspection assertion (NUM_KEYMAP_LAYERS_RAW<=MAX_LAYER) fails.
+#define MAX_LAYER 8
 
 // Combos: ESC (pos39+38) and TAB (pos11+12) from mona2
 #define COMBO_COUNT 2
