@@ -7,12 +7,6 @@ set -e
 QMK_HOME=/mnt/e/keyball/__qmk__
 KEYBALL_DIR=/mnt/e/keyball
 
-echo "=== Installing AVR toolchain and build tools ==="
-sudo apt-get update -qq
-sudo apt-get install -y --no-install-recommends \
-  gcc-avr binutils-avr avr-libc \
-  make git python3-pip dfu-programmer dfu-util
-
 echo "=== Installing QMK CLI ==="
 python3 -m pip install --user qmk
 export PATH="$HOME/.local/bin:$PATH"
@@ -25,7 +19,7 @@ else
     https://github.com/qmk/qmk_firmware "$QMK_HOME"
   cd "$QMK_HOME"
   git submodule update --init --depth 1 \
-    lib/lufa lib/printf lib/unity
+    lib/lufa lib/printf
 fi
 
 echo "=== Installing Python requirements ==="
