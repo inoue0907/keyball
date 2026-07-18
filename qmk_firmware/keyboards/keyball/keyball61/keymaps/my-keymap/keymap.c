@@ -9,6 +9,72 @@ enum my_layers {
     L_MOUSE,    // 4: auto-mouse (trackball movement activates this)
 };
 
+// カスタムキーコード（keyball の safe range から確保）
+enum my_keycodes {
+    JU_TOGG = KEYBALL_SAFE_RANGE, // JIS配列 ⇔ US配列 をワンタッチで切り替え
+};
+
+// -----------------------------------------------------------------------
+// US/JIS 切り替えラッパー
+//
+// このキーマップの記号キーはすべて「OSをUS設定にした状態」で正しい文字が
+// 出るように書かれている（USネイティブ）。
+// jis_mode が真のときだけ、同じ見た目の文字がJIS設定OSでも出るように
+// キーコードを翻訳して送出する。IMEキー(KC_LNG1/2=かな/英数)や
+// もともとJIS用に置かれたキー(KC_INT1/INT3 等)、修飾キーには手を触れない。
+// -----------------------------------------------------------------------
+static bool jis_mode = false; // false: US(既定, ネイティブ) / true: JIS
+
+// US設定で「ある文字」を出すキーコードを、JIS設定で同じ文字を出す
+// キーコードへ変換する。該当が無ければ 0 を返す。
+static uint16_t us_to_jis(uint16_t kc) {
+    switch (kc) {
+        // --- 修飾なし ---
+        case KC_EQL:       return S(KC_MINS);  // =
+        case KC_QUOT:      return S(KC_7);     // '
+        case KC_LBRC:      return KC_RBRC;     // [
+        case KC_RBRC:      return KC_BSLS;     // ]
+        case KC_BSLS:      return KC_INT1;     // \  (US backslash → JISは KC_INT1)
+        case KC_GRV:       return S(KC_LBRC);  // `
+        // --- Shift 付き ---
+        case S(KC_2):      return KC_LBRC;     // @
+        case S(KC_6):      return KC_EQL;      // ^
+        case S(KC_7):      return S(KC_6);     // &
+        case S(KC_8):      return S(KC_QUOT);  // *
+        case S(KC_9):      return S(KC_8);     // (
+        case S(KC_0):      return S(KC_9);     // )
+        case S(KC_MINS):   return S(KC_INT1);  // _
+        case S(KC_EQL):    return S(KC_SCLN);  // +
+        case S(KC_QUOT):   return S(KC_2);     // "
+        case S(KC_SCLN):   return KC_QUOT;     // :
+        case S(KC_LBRC):   return S(KC_RBRC);  // {
+        case S(KC_RBRC):   return S(KC_BSLS);  // }
+        case S(KC_GRV):    return S(KC_EQL);   // ~
+        default:           return 0;
+    }
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (keycode == JU_TOGG) {
+        if (record->event.pressed) {
+            jis_mode = !jis_mode;
+        }
+        return false;
+    }
+
+    // JIS設定のときだけ記号キーを翻訳して送出する
+    if (jis_mode) {
+        uint16_t jis_kc = us_to_jis(keycode);
+        if (jis_kc != 0) {
+            if (record->event.pressed) {
+                tap_code16(jis_kc);
+            }
+            return false; // 押下/離上とも既定処理へは流さない
+        }
+    }
+    return true;
+}
+
 const uint16_t PROGMEM combo_esc[] = {LT(3,KC_LNG2), LSFT_T(KC_TAB), COMBO_END};
 combo_t key_combos[] = {
     COMBO(combo_esc, KC_ESC),
@@ -21,7 +87,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Layer 0: Base — oyayubi (親指シフト的) 配列
   // -----------------------------------------------------------------------
   [L_BASE] = LAYOUT_universal(
-    KC_ESC      , KC_F15      , KC_F16      , KC_F17      , KC_F18      , KC_F19      , KC_F20      , KC_F21      , KC_F22      , KC_F23      , KC_F24      , S(KC_MINS)  ,
+    KC_ESC      , KC_F15      , KC_F16      , KC_F17      , KC_F18      , KC_F19      , KC_F20      , KC_F21      , KC_F22      , KC_F23      , JU_TOGG     , S(KC_MINS)  ,
     KC_DEL      , KC_Q        , KC_L        , KC_U        , KC_COMM     , KC_DOT      , KC_F        , KC_W        , KC_R        , KC_Y        , KC_P        , KC_INT3     ,
     KC_TAB      , KC_E        , KC_I        , KC_A        , KC_O        , KC_MINS     , KC_K        , KC_T        , KC_N        , KC_S        , LT(3,KC_H)  , MO(3)       ,
     KC_LSFT     , KC_Z        , KC_X        , KC_C        , KC_V        , KC_SCLN     , S(KC_SCLN)  , KC_BSPC     , KC_G        , KC_D        , KC_M        , KC_J        , KC_B        , KC_RSFT     ,
