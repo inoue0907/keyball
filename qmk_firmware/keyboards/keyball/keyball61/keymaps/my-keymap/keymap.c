@@ -66,7 +66,15 @@ static void tap_layout_keycode(uint16_t keycode) {
 }
 
 // 1回=()、2回=[]、3回={}。入力後はカーソルを括弧の内側へ戻す。
+static bool pair_shift_held = false;
+
 static void pair_dance_finished(tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1 && state->pressed) {
+        register_mods(MOD_BIT(KC_LSFT));
+        pair_shift_held = true;
+        return;
+    }
+
     switch (state->count) {
         case 1:
             tap_layout_keycode(S(KC_9));
@@ -84,8 +92,15 @@ static void pair_dance_finished(tap_dance_state_t *state, void *user_data) {
     tap_code(KC_LEFT);
 }
 
+static void pair_dance_reset(tap_dance_state_t *state, void *user_data) {
+    if (pair_shift_held) {
+        unregister_mods(MOD_BIT(KC_LSFT));
+        pair_shift_held = false;
+    }
+}
+
 tap_dance_action_t tap_dance_actions[] = {
-    [TD_PAIR] = ACTION_TAP_DANCE_FN(pair_dance_finished),
+    [TD_PAIR] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, pair_dance_finished, pair_dance_reset),
 };
 
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
