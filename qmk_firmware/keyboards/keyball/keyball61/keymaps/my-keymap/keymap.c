@@ -12,6 +12,11 @@ enum my_layers {
 // カスタムキーコード（keyball の safe range から確保）
 enum my_keycodes {
     JU_TOGG = KEYBALL_SAFE_RANGE, // JIS配列 ⇔ US配列 をワンタッチで切り替え
+    SELECT_LINE,                  // 現在行を先頭から末尾まで選択
+};
+
+enum tap_dances {
+    TD_PAIR,
 };
 
 // -----------------------------------------------------------------------
@@ -54,10 +59,47 @@ static uint16_t us_to_jis(uint16_t kc) {
     }
 }
 
+// 現在のUS/JIS設定に合わせて、見た目が同じ記号を送出する。
+static void tap_layout_keycode(uint16_t keycode) {
+    uint16_t output = jis_mode ? us_to_jis(keycode) : 0;
+    tap_code16(output != 0 ? output : keycode);
+}
+
+// 1回=()、2回=[]、3回={}。入力後はカーソルを括弧の内側へ戻す。
+static void pair_dance_finished(tap_dance_state_t *state, void *user_data) {
+    switch (state->count) {
+        case 1:
+            tap_layout_keycode(S(KC_9));
+            tap_layout_keycode(S(KC_0));
+            break;
+        case 2:
+            tap_layout_keycode(KC_LBRC);
+            tap_layout_keycode(KC_RBRC);
+            break;
+        default:
+            tap_layout_keycode(S(KC_LBRC));
+            tap_layout_keycode(S(KC_RBRC));
+            break;
+    }
+    tap_code(KC_LEFT);
+}
+
+tap_dance_action_t tap_dance_actions[] = {
+    [TD_PAIR] = ACTION_TAP_DANCE_FN(pair_dance_finished),
+};
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (keycode == JU_TOGG) {
         if (record->event.pressed) {
             jis_mode = !jis_mode;
+        }
+        return false;
+    }
+
+    if (keycode == SELECT_LINE) {
+        if (record->event.pressed) {
+            tap_code(KC_HOME);
+            tap_code16(S(KC_END));
         }
         return false;
     }
@@ -124,8 +166,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______     , _______     , _______     , _______     , _______     , _______     , _______     , _______     , _______     , _______     , _______     , _______     ,
     _______     , _______     , _______     , _______     , _______     , _______     , KC_HOME     , C(KC_LEFT)  , C(KC_RGHT)  , KC_END      , _______     , _______     ,
     _______     , _______     , _______     , _______     , _______     , _______     , KC_LEFT     , KC_DOWN     , KC_UP       , KC_RGHT     , A(C(KC_TAB)), _______     ,
-    _______     , _______     , _______     , _______     , _______     , _______     , G(KC_L)     , KC_NO       , S(KC_LEFT)  , S(KC_DOWN)  , S(KC_UP)    , S(KC_RGHT)  , _______     , _______     ,
-    QK_BOOT     , _______     , _______     , _______     , _______     , _______     , _______     , KC_LSFT     , KC_LGUI     , _______     , _______     , _______     , _______     , QK_BOOT
+    _______     , _______     , _______     , _______     , _______     , _______     , G(KC_L)     , SELECT_LINE , S(KC_LEFT)  , S(KC_DOWN)  , S(KC_UP)    , S(KC_RGHT)  , _______     , _______     ,
+    QK_BOOT     , _______     , _______     , _______     , _______     , _______     , _______     , TD(TD_PAIR) , KC_LGUI     , _______     , _______     , _______     , _______     , QK_BOOT
   ),
 
   // -----------------------------------------------------------------------
