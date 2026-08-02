@@ -88,6 +88,15 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_PAIR] = ACTION_TAP_DANCE_FN(pair_dance_finished),
 };
 
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case QK_TAP_DANCE ... QK_TAP_DANCE_MAX:
+            return 350;
+        default:
+            return TAPPING_TERM;
+    }
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (keycode == JU_TOGG) {
         if (record->event.pressed) {
