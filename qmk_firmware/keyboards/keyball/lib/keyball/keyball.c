@@ -37,6 +37,7 @@ const uint16_t AML_ACTIVATE_THRESHOLD = 50;
 
 #ifdef OLED_ENABLE
 static const char BL = '\xB0'; // Blank indicator character
+#ifdef OLED_ENABLE
 static const char LFSTR_ON[] PROGMEM = "\xB2\xB3";
 static const char LFSTR_OFF[] PROGMEM = "\xB4\xB5";
 #endif
@@ -703,6 +704,7 @@ void housekeeping_task_kb(void) {
 
 #ifdef OLED_ENABLE
 static void pressing_keys_update(uint16_t keycode, keyrecord_t *record) {
+#ifdef OLED_ENABLE
     // Process only valid keycodes.
     if (keycode >= 4 && keycode < 57) {
         char value = pgm_read_byte(code_to_name + keycode - 4);
@@ -720,6 +722,7 @@ static void pressing_keys_update(uint16_t keycode, keyrecord_t *record) {
             }
         }
     }
+#endif
 }
 #endif
 
