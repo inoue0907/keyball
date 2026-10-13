@@ -205,6 +205,22 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     return TAPPING_TERM;
 }
 
+// 記号レイヤーの親指キー（LNG1 → L_SYM）
+// PERMISSIVE_HOLD は「別キーを押して離す」まで親指を押さえていないとホールドにならない。
+// 速いロールで親指を "?" より先に離すとタップ扱いになり、LNG1 + "t" が出ていた。
+// このキーだけ、押している間に別キーを押したら離す順に関係なくホールドにする。
+#define LT_SYM LT(1, KC_LNG1)
+
+bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
+    return keycode == LT_SYM;
+}
+
+// LNG1 をタップした直後に押し直しても LNG1 の連打ではなく記号レイヤーにする
+uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
+    if (keycode == LT_SYM) return 0;
+    return QUICK_TAP_TERM;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // IME 状態の追跡（LT/MT のタップ側も見る）
     if (record->event.pressed) {
