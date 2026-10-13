@@ -37,7 +37,6 @@ const uint16_t AML_ACTIVATE_THRESHOLD = 50;
 
 #ifdef OLED_ENABLE
 static const char BL = '\xB0'; // Blank indicator character
-#ifdef OLED_ENABLE
 static const char LFSTR_ON[] PROGMEM = "\xB2\xB3";
 static const char LFSTR_OFF[] PROGMEM = "\xB4\xB5";
 #endif
