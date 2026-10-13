@@ -1,0 +1,79 @@
+name: keymap docs
+
+# my-keymap や生成スクリプトを触ったら早見表と PDF を作り直して、
+# 変わっていればコミットし、早見表を GitHub Pages に出す。
+on:
+  push:
+    branches: [main]
+    paths:
+      - qmk_firmware/keyboards/keyball/keyball61/keymaps/my-keymap/keymap.c
+      - qmk_firmware/keyboards/keyball/keyball61/info.json
+      - tools/**
+      - .github/workflows/keymap-docs.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write   # 生成物のコミット
+  pages: write      # Pages へのデプロイ
+  id-token: write   # deploy-pages の OIDC
+
+# 生成物のコミットが競合しないよう直列化する
+concurrency:
+  group: keymap-docs
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Web フォントが取れなかったときの日本語フォールバック
+      - name: Install CJK fonts
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+
+      - name: Regenerate viewer and PDF
+        run: |
+          python tools/gen_keymap_viewer.py
+          python tools/gen_keymap_pdf.py
+
+      - name: Commit if changed
+        run: |
+          # PDF は作り直すたびにバイト列が変わるので、早見表が同じなら捨てる
+          if git diff --quiet -- docs/keymap-viewer.html; then
+            git checkout -- docs/keymap.pdf
+          fi
+          if git diff --quiet -- docs && [ -z "$(git ls-files --others -- docs)" ]; then
+            echo "docs are already up to date"
+            exit 0
+          fi
+          git diff --stat -- docs
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git commit -m "docs: regenerate keymap viewer [skip ci]"
+          git push
+
+      - name: Stage Pages site
+        run: |
+          mkdir -p _site
+          cp docs/keymap-viewer.html _site/index.html
+          cp docs/keymap.pdf _site/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
