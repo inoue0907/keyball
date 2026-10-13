@@ -189,6 +189,10 @@ def label(code):
         return ('L' + m.group(2), how, 'layer')
     if code in WRAP:
         return (WRAP[code], u'長押しで囲む', 'macro')
+    if code == 'TD(TD_PAIR)':
+        return (u'()\n[] {}', u'長押し Shift', 'macro')
+    if code == 'SEL_LINE':
+        return (u'行選択', '', 'macro')
     if code == 'QK_BOOT':
         return (u'ブート\nローダ', '', 'system')
     if code == 'BOOT_HLD':

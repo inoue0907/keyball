@@ -20,6 +20,11 @@ enum custom_keycodes {
     WR_PRN,               // (  )
     WR_CBR,               // {  }
     WR_BRC,               // [  ]
+    SEL_LINE,             // 現在行を先頭から末尾まで選択（Home → Shift+End）
+};
+
+enum tap_dances {
+    TD_PAIR, // L_SET の右親指: 1 回 = ()、2 回 = []、3 回 = {}、長押し = Shift
 };
 
 const uint16_t PROGMEM combo_esc[] = {LT(3,KC_LNG2), LSFT_T(KC_TAB), COMBO_END};
@@ -67,13 +72,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Layer 3: Set — スクロール / RGB / ナビゲーション / 設定
   //   トラックボールがスクロールホイールとして動作するレイヤー
   //   左の QK_BOOT は左上隅。左下は Ctrl+矢印 を打つため透過にしてある
+  //   英数の親指を押さえたまま隣の Shift 親指を叩くと括弧の対を入力する（TD_PAIR）
   // -----------------------------------------------------------------------
   [L_SET] = LAYOUT_universal(
     QK_BOOT     , _______     , _______     , _______     , _______     , _______     , _______     , _______     , _______     , _______     , _______     , _______     ,
     _______     , _______     , _______     , _______     , _______     , _______     , KC_HOME     , C(KC_LEFT)  , C(KC_RGHT)  , KC_END      , _______     , _______     ,
     _______     , _______     , _______     , _______     , _______     , _______     , KC_LEFT     , KC_DOWN     , KC_UP       , KC_RGHT     , A(C(KC_TAB)), _______     ,
-    _______     , _______     , _______     , _______     , _______     , _______     , G(KC_L)     , KC_NO       , S(KC_LEFT)  , S(KC_DOWN)  , S(KC_UP)    , S(KC_RGHT)  , _______     , _______     ,
-    _______     , _______     , _______     , _______     , _______     , _______     , _______     , KC_LSFT     , KC_LGUI     , _______     , _______     , _______     , _______     , QK_BOOT
+    _______     , _______     , _______     , _______     , _______     , _______     , G(KC_L)     , SEL_LINE    , S(KC_LEFT)  , S(KC_DOWN)  , S(KC_UP)    , S(KC_RGHT)  , _______     , _______     ,
+    _______     , _______     , _______     , _______     , _______     , _______     , _______     , TD(TD_PAIR) , KC_LGUI     , _______     , _______     , _______     , _______     , QK_BOOT
   ),
 
   // -----------------------------------------------------------------------
@@ -157,6 +163,48 @@ static void wrap_send_wrap(uint16_t kc) {
     if (ime_on) tap_code(KC_ENT);
 }
 
+// ---------------------------------------------------------------------------
+// 括弧の対を入力する親指キー（moNa2 の pair_shift と同じ動き）
+//   1 回 = ()、2 回 = []、3 回 = {}。入力後はカーソルを括弧の内側へ戻す
+//   押したまま別のキーを打つ / 長押し = Shift（このキーの元の役目）
+// IME ON だと括弧が未確定のまま ← が送られ、確定時にカーソルが閉じ括弧の後ろへ
+// 飛ぶので、← の前に Enter で確定させる。
+// ---------------------------------------------------------------------------
+#define PAIR_TERM 350 // 2 回目・3 回目を待つ時間 (ms)
+
+static bool pair_shift_held = false;
+
+static void pair_dance_finished(tap_dance_state_t *state, void *user_data) {
+    if (state->count == 1 && state->pressed) {
+        register_mods(MOD_BIT(KC_LSFT));
+        pair_shift_held = true;
+        return;
+    }
+    switch (state->count) {
+        case 1:  tap_code16(S(KC_9));    tap_code16(S(KC_0));    break; // ( )
+        case 2:  tap_code16(KC_LBRC);    tap_code16(KC_RBRC);    break; // [ ]
+        default: tap_code16(S(KC_LBRC)); tap_code16(S(KC_RBRC)); break; // { }
+    }
+    if (ime_on) tap_code(KC_ENT);
+    tap_code(KC_LEFT);
+}
+
+static void pair_dance_reset(tap_dance_state_t *state, void *user_data) {
+    if (pair_shift_held) {
+        unregister_mods(MOD_BIT(KC_LSFT));
+        pair_shift_held = false;
+    }
+}
+
+tap_dance_action_t tap_dance_actions[] = {
+    [TD_PAIR] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, pair_dance_finished, pair_dance_reset),
+};
+
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    if (keycode == TD(TD_PAIR)) return PAIR_TERM;
+    return TAPPING_TERM;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // IME 状態の追跡（LT/MT のタップ側も見る）
     if (record->event.pressed) {
@@ -181,6 +229,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         } else if (wrap_pending == keycode) {
             wrap_send_tap(keycode); // 長押し前に離した = タップ
             wrap_pending = 0;
+        }
+        return false;
+    }
+
+    if (keycode == SEL_LINE) {
+        if (record->event.pressed) {
+            tap_code(KC_HOME);
+            tap_code16(S(KC_END));
         }
         return false;
     }

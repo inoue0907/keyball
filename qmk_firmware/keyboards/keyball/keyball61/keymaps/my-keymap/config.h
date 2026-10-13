@@ -4,6 +4,7 @@
 
 // タップ判定時間 (ms)
 #define TAPPING_TERM 150
+#define TAPPING_TERM_PER_KEY
 // キーを押しながら別のキーを打つと即座にホールドと判定
 #define PERMISSIVE_HOLD
 
