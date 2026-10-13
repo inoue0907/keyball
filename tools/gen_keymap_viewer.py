@@ -9,6 +9,7 @@ JSON で埋め込むだけ。単体の HTML なのでブラウザで直接開け
 import io
 import json
 import os
+import re
 
 from keyball61_layout import DOCS, GEO, label, parse_combos, parse_layers, write
 
@@ -16,13 +17,28 @@ TEMPLATE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         'keymap.template.html')
 
 
+def hold_target(code):
+    """押している間だけ効くレイヤーキーなら、そのレイヤー番号を返す。"""
+    m = re.match(r'^(?:LT\((\w+),.*|(?:MO|TT)\((\w+)\))$', code)
+    return (m.group(1) or m.group(2)) if m else None
+
+
+def key_data(code, order):
+    d = dict(zip(('main', 'sub', 'cat'), label(code)), raw=code)
+    to = hold_target(code)
+    if to is not None:
+        to = int(to) if to.isdigit() else order[to]
+        d['to'] = to
+    return d
+
+
 def main():
     parsed = parse_layers()
+    order = {L['node']: L['id'] for L in parsed}
     layers = [{
         'id': L['id'],
         'ja': L['ja'],
-        'keys': [dict(zip(('main', 'sub', 'cat'), label(b)), raw=b)
-                 for b in L['raw']],
+        'keys': [key_data(b, order) for b in L['raw']],
     } for L in parsed]
 
     base = parsed[0]['raw']

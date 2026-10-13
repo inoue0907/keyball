@@ -153,6 +153,11 @@ h1 span { color: var(--faint); }
 .key[data-cat="trans"] .main { color: var(--faint); }
 .key[data-cat="layer"]  { border-color: var(--copper); }
 .key[data-cat="layer"]  .main, .key[data-cat="layer"]  .sub { color: var(--copper); }
+/* 押している間だけ、そのレイヤーを見せる */
+.key[data-to] { cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: none; }
+.key[data-to]:hover { background: #fbf3ea; }
+.key.held { background: var(--copper); border-color: var(--copper); border-style: solid; }
+.key.held .main, .key.held .sub, .key.held .pos { color: #fff; }
 .key[data-cat="mod"]    .main, .key[data-cat="mod"]    .sub { color: var(--teal); }
 .key[data-cat="mouse"]  .main, .key[data-cat="mouse"]  .sub { color: var(--violet); }
 .key[data-cat="macro"]  .main, .key[data-cat="macro"]  .sub { color: var(--gold); }
@@ -186,7 +191,7 @@ body.printing { --u: 54px; }
     <h1>keyball61 <span>キーマップ</span></h1>
     <a class="dl" href="keymap.pdf" download>PDF</a>
   </div>
-  <p class="hint">キー左上の数字が <b>位置番号</b>（<code>my-keymap/keymap.c</code> の <code>LAYOUT_universal</code> の 0 → 63 の順）。上の小さい文字は長押し側・修飾キー。</p>
+  <p class="hint">キー左上の数字が <b>位置番号</b>（<code>my-keymap/keymap.c</code> の <code>LAYOUT_universal</code> の 0 → 63 の順）。上の小さい文字は長押し側・修飾キー。レイヤーキーはマウスで押している間、そのレイヤーを表示する。</p>
 
   <div class="rail" role="tablist" aria-label="レイヤー" id="rail"></div>
 
@@ -224,6 +229,9 @@ body.printing { --u: 54px; }
   document.documentElement.style.setProperty('--cols', D.cols);
   document.documentElement.style.setProperty('--rows', D.rows);
 
+  var byId = {};
+  LAY.forEach(function (L, i) { byId[L.id] = i; });
+
   var comboPos = {};
   (D.combos || []).forEach(function (c) { c.pos.forEach(function (p) { comboPos[p] = 1; }); });
 
@@ -257,10 +265,19 @@ body.printing { --u: 54px; }
       var key = L.keys[pos];
       k.dataset.cat = key.cat;
       k.title = '位置 ' + pos + '  ' + key.raw;
+      if (key.to != null && byId[key.to] != null && byId[key.to] !== li) {
+        k.dataset.to = key.to;
+        k.addEventListener('pointerdown', function (e) {
+          if (e.button !== 0) return;
+          e.preventDefault();
+          hold(byId[key.to], pos);
+        });
+      }
       c.sub.textContent = key.sub;
       c.subrow.hidden = !key.sub;
       c.main.textContent = key.main;
       c.main.className = 'main' + (JA_RE.test(key.main) ? ' ja' : '');
+      c.el = k;
       return c;
     });
     holder.appendChild(board);
@@ -287,12 +304,33 @@ body.printing { --u: 54px; }
     if (s < 0.995) span.style.transform = 'scale(' + Math.max(s, 0.45).toFixed(3) + ')';
   }
 
+  /* レイヤーキーを押している間だけ別のレイヤーを見せる（離すと cur に戻る） */
+  var peek = null, heldPos = null;
+  function hold(to, pos) {
+    peek = to; heldPos = pos;
+    paint();
+  }
+  function release() {
+    if (peek == null) return;
+    peek = null; heldPos = null;
+    paint();
+  }
+  addEventListener('pointerup', release);
+  addEventListener('pointercancel', release);
+  addEventListener('blur', release);
+
   function paint() {
+    var shown = peek != null ? peek : cur;
     tabs.forEach(function (t, i) {
-      t.setAttribute('aria-selected', i === cur ? 'true' : 'false');
+      t.setAttribute('aria-selected', i === shown ? 'true' : 'false');
       t.tabIndex = i === cur ? 0 : -1;
     });
-    boards.forEach(function (b, i) { b.el.hidden = i !== cur; });
+    boards.forEach(function (b, i) {
+      b.el.hidden = i !== shown;
+      b.cells.forEach(function (c, pos) {
+        c.el.classList.toggle('held', i === shown && pos === heldPos);
+      });
+    });
     refit();
   }
 
@@ -308,6 +346,7 @@ body.printing { --u: 54px; }
   }
 
   function printing(on) {
+    peek = null; heldPos = null;
     document.body.classList.toggle('printing', on);
     if (!on) return paint();
     boards.forEach(function (b) { b.el.hidden = false; });
